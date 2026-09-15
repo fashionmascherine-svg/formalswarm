@@ -1,0 +1,32 @@
+# ── FormalSwarm — what must never be published ──────────────────────────────
+#
+# Everything the plugin SHIPS is committed: core/, lib/, prompts/, skills/,
+# commands/, tests/, the manifests and the docs. What follows is local state,
+# noise, or material that is deliberately not part of the published project.
+
+# Generated per machine by `formalswarm init`, and by every debate that runs:
+# the detected profile and the scratch directory with its artefacts.
+.formalswarm/
+
+# A historical, repository-specific debate that predates this plugin. It stays on
+# your disk and is left untouched; it is not published because it references a
+# private checkout. Delete this entry to publish it too.
+agents/
+
+# Packaging and dependencies (the plugin itself has none)
+node_modules/
+*.tgz
+npm-debug.log*
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*~
+
+# Local experiments
+tmp/
+*.local.*

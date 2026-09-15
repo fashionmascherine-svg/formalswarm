@@ -1,0 +1,57 @@
+{
+  "name": "formalswarm",
+  "version": "1.0.0",
+  "description": "Repo-agnostic multi-agent validation plugin: parallel theses, adversarial antithesis, and a non-negotiable seal whose verdict is computed deterministically from real command exit codes. Runs on DeepSeek Harness, Claude Code and ZCode.",
+  "type": "commonjs",
+  "license": "MIT",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "claude-code",
+    "zcode",
+    "cordis",
+    "multi-agent",
+    "adversarial-review",
+    "verification",
+    "seal"
+  ],
+  "exports": {
+    "./skills": "./lib/skills.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "formalswarm": "core/bin/formalswarm.js"
+  },
+  "files": [
+    "core/**/*.js",
+    "lib/**/*.mjs",
+    "prompts/**/*.md",
+    "skills/**/*.md",
+    "commands/**/*.md",
+    "tests/*.js",
+    "tests/fixtures/**/*",
+    ".claude-plugin/plugin.json",
+    ".claude-plugin/marketplace.json",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "validate": "node core/validate-all.js",
+    "validate:body": "node core/validate-body.js",
+    "validate:driver": "node core/validate-driver.js",
+    "validate:profile": "node core/validate-profile.js",
+    "validate:generic": "node core/validate-generic.js",
+    "test": "node core/validate-all.js",
+    "test:e2e": "node tests/smoke-e2e.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}

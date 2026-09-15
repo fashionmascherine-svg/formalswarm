@@ -1,0 +1,19 @@
+{
+  "name": "formalswarm",
+  "owner": {
+    "name": "FormalSwarm contributors"
+  },
+  "metadata": {
+    "description": "Repo-agnostic multi-agent validation for any repository: theses, antithesis, and a deterministic seal.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "formalswarm",
+      "description": "Parallel theses, adversarial antithesis and a non-negotiable seal whose verdict is computed from real exit codes. Auto-detects the target repository stack.",
+      "source": "./",
+      "version": "1.0.0",
+      "category": "workflow"
+    }
+  ]
+}

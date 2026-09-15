@@ -1,0 +1,70 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  offline-gate:
+    name: offline gate (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18.17', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # The gate: deterministic mocks, zero agent calls, zero network.
+      - name: Protocol suites
+        run: node core/validate-all.js
+      # The integration proof: a real repository, a real toolchain, real exit codes.
+      - name: End-to-end smoke
+        if: matrix.node == '22'
+        run: node tests/smoke-e2e.js
+
+  package:
+    name: the published artefact works on its own
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # A file missing from package.json's `files` list, or an empty directory that a
+      # tarball silently drops, only shows up once the package leaves the checkout.
+      - name: Pack, extract, and run from the extracted copy
+        run: |
+          mkdir -p /tmp/pkg /tmp/unpacked
+          npm pack --pack-destination /tmp/pkg
+          tar xzf /tmp/pkg/formalswarm-*.tgz -C /tmp/unpacked
+          cd /tmp/unpacked/package
+          node core/validate-all.js
+          node tests/smoke-e2e.js
+
+  bundle:
+    name: bundle patch is loadable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: The bundle patch parses and its row resolves
+        run: |
+          node -e "
+          const fs = require('node:fs');
+          const pkg = require('./package.json');
+          const text = fs.readFileSync(pkg.dsh.bundle.patch, 'utf8');
+          const rows = text.split('\n').filter((l) => /^\s*-\s*id:/.test(l));
+          if (rows.length !== 1) throw new Error('expected exactly one row');
+          const name = text.split('\n').filter((l) => /^\s*name:/.test(l))[0].split(':')[1].trim();
+          if (name !== pkg.name + '/skills') throw new Error('row ' + name + ' does not match the package name');
+          const target = pkg.exports['./' + name.split('/')[1]];
+          if (!target || !fs.existsSync(target)) throw new Error('the row does not resolve to a file');
+          console.log('bundle ok:', name, '->', target);
+          "

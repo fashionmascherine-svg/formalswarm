@@ -1,0 +1,4 @@
+{
+  "name": "fixture-vitest",
+  "devDependencies": { "vitest": "^2.0.0" }
+}

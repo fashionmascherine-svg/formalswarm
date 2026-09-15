@@ -1,0 +1,20 @@
+# The FormalSwarm bundle patch for DeepSeek Harness.
+#
+# Applied when a profile lists this bundle, either from a git source:
+#   dsh plugin --profile <name> add github:<owner>/FormalSwarm
+# or from a local checkout:
+#   dsh plugin --profile <name> add /abs/path/to/FormalSwarm
+#
+# One independent row, so a deployment can disable it in a later layer with
+# `- id: formalswarm-skills\n  disabled: true`.
+#
+# The row registers the FormalSwarm protocol as a runtime skill on ctx.skills:
+# it is a pure document capability and publishes no service, so it needs no
+# isolate realm and installs into the global layer. Everything else FormalSwarm
+# ships (the workflow body, the round driver, the profiler and the CLI) is
+# invoked as ordinary Node scripts through the bash tool of whichever runtime
+# the session runs on — no Cordis service is involved, which is exactly what
+# makes the same body executable on DeepSeek Harness, Claude Code and ZCode.
+- insert:
+    - id: formalswarm-skills
+      name: formalswarm/skills

@@ -1,0 +1,14 @@
+# Normalise the working tree to LF on every platform.
+#
+# The plugin ships text that its own validators read, compare and parse:
+# SKILL.md frontmatter, command frontmatter, schemas, prompts, fixtures. A Windows
+# checkout with `core.autocrlf=true` would rewrite every one of those files to CRLF
+# and break the comparisons, so the line ending is pinned here instead of being left
+# to each machine's git configuration.
+* text=auto eol=lf
+
+# Never touch binaries.
+*.png binary
+*.ico binary
+*.jpg binary
+*.tgz binary

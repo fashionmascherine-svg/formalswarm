@@ -1,0 +1,4 @@
+{
+  "name": "fixture/php",
+  "scripts": { "test": "phpunit" }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "formalswarm",
+  "description": "Repo-agnostic multi-agent validation: parallel theses, adversarial antithesis, and a seal whose verdict is read from real command exit codes instead of prose. Works on any repository and any stack through an auto-detected profile.",
+  "version": "1.0.0",
+  "author": {
+    "name": "FormalSwarm contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "multi-agent",
+    "adversarial-review",
+    "verification",
+    "seal",
+    "thesis",
+    "antithesis",
+    "code-review",
+    "deepseek-harness",
+    "zcode"
+  ]
+}
