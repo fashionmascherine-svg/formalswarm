@@ -15,6 +15,14 @@
     "verification",
     "seal"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fashionmascherine-svg/formalswarm.git"
+  },
+  "homepage": "https://github.com/fashionmascherine-svg/formalswarm#readme",
+  "bugs": {
+    "url": "https://github.com/fashionmascherine-svg/formalswarm/issues"
+  },
   "exports": {
     "./skills": "./lib/skills.mjs",
     "./package.json": "./package.json"

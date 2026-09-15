@@ -8,10 +8,10 @@ codes and case counts, never out of an agent's prose. Any repository, any langua
 scale: from a 6-agent pilot to hundreds of agents. On DeepSeek Harness, Claude Code and
 ZCode from one and the same code.
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
-![node](https://img.shields.io/badge/node-%E2%89%A518.17-brightgreen.svg)
+[![ci](https://github.com/fashionmascherine-svg/formalswarm/actions/workflows/ci.yml/badge.svg)](https://github.com/fashionmascherine-svg/formalswarm/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![node](https://img.shields.io/badge/node-%E2%89%A518.17-brightgreen.svg)](package.json)
 ![runtimes](https://img.shields.io/badge/runtimes-DeepSeek%20Harness%20%7C%20Claude%20Code%20%7C%20ZCode-blueviolet.svg)
-![offline gate](https://img.shields.io/badge/offline%20gate-green-brightgreen.svg)
 ![agent calls to validate](https://img.shields.io/badge/agent%20calls%20to%20validate%20it-0-informational.svg)
 
 ---
@@ -232,7 +232,7 @@ ignored.
 ```sh
 dsh plugin --profile <profile> add /path/to/FormalSwarm
 # or from git:
-dsh plugin --profile <profile> add github:<owner>/FormalSwarm
+dsh plugin --profile <profile> add github:fashionmascherine-svg/formalswarm
 ```
 
 Restart the profile. The bundle inserts one row that registers the protocol as a runtime
@@ -246,7 +246,7 @@ skill, and can be disabled by id in any later patch layer:
 ### Claude Code
 
 ```sh
-claude plugin marketplace add /path/to/FormalSwarm
+claude plugin marketplace add fashionmascherine-svg/formalswarm
 claude plugin install formalswarm@formalswarm
 ```
 
@@ -254,8 +254,9 @@ This repository is itself a marketplace (`.claude-plugin/marketplace.json`).
 
 ### ZCode
 
-Settings → **Plugin Management** → **Discover** → add this directory or its git URL →
-install **FormalSwarm** → start a new session. ZCode consumes the same
+Settings → **Plugin Management** → **Discover** → add
+`https://github.com/fashionmascherine-svg/formalswarm` → install **FormalSwarm** →
+start a new session. ZCode consumes the same
 `.claude-plugin/` manifest, the same `SKILL.md` bundle and the same slash commands.
 
 ---
@@ -342,5 +343,6 @@ tests/                   fixtures and the end-to-end smoke test
 
 ## License
 
-MIT — see `LICENSE`. Contributions and counterexamples are welcome; the most useful
-issue you can open is a `seal_plan` that made the rollup return the wrong verdict.
+MIT — see `LICENSE`. Contributions and counterexamples are welcome: the most useful
+[issue](https://github.com/fashionmascherine-svg/formalswarm/issues) you can open is a
+`seal_plan` that made the rollup return the wrong verdict.
