@@ -1,4 +1,10 @@
+<p align="center">
+  <img src="docs/icon.jpg" width="112" alt="FormalSwarm icon">
+</p>
+
 # FormalSwarm
+
+![FormalSwarm cover — thesis, antithesis, seal: a verdict you can recompute](docs/cover.jpg)
 
 **Your agent says the change is safe. FormalSwarm makes it prove it.**
 
@@ -13,6 +19,7 @@ ZCode from one and the same code.
 [![node](https://img.shields.io/badge/node-%E2%89%A518.17-brightgreen.svg)](package.json)
 ![runtimes](https://img.shields.io/badge/runtimes-DeepSeek%20Harness%20%7C%20Claude%20Code%20%7C%20ZCode-blueviolet.svg)
 ![agent calls to validate](https://img.shields.io/badge/agent%20calls%20to%20validate%20it-0-informational.svg)
+[![discussions](https://img.shields.io/badge/discussions-welcome-8A2BE2.svg)](https://github.com/fashionmascherine-svg/formalswarm/discussions)
 
 ---
 
@@ -130,6 +137,19 @@ failure modes show up constantly, and none of them is a stupid mistake:
 
 FormalSwarm exists to make those three states mechanically visible, and to make the
 verdict a *computation* rather than a *judgement*.
+
+## Why not just ask another agent to review it?
+
+Because you would get a second confident paragraph. The difference is not the model —
+it is what counts as evidence:
+
+| | A reviewer (human or model) | FormalSwarm |
+|---|---|---|
+| Evidence that "it works" | prose | real exit codes and counted cases |
+| Adversarial pressure | depends on the reviewer | partitioned critics, hunting hallucinations by contract |
+| A check that tested nothing | invisible | `cases: 0` → `INCONCLUSIVE` — empty green is a verdict, not a pass |
+| A subagent that died | invisible, or worse | `fallen_agents` and warnings — silence is never a vote |
+| The final answer | an opinion you re-read | `outcome.json` — a computation anyone can re-run |
 
 ---
 
@@ -392,6 +412,7 @@ lib/skills.mjs           the Cordis row registering the skill on DeepSeek Harnes
 cordis.patch.yml         the DeepSeek Harness bundle patch
 .github/workflows/ci.yml the offline gate, the packaged artefact, the bundle patch
 tests/                   fixtures and the end-to-end smoke test
+docs/                    cover art and icon
 ```
 
 > A historical, repository-specific debate that predates this plugin stays on the
@@ -400,6 +421,8 @@ tests/                   fixtures and the end-to-end smoke test
 
 ## License
 
-MIT — see `LICENSE`. Contributions and counterexamples are welcome: the most useful
+MIT — see `LICENSE`. If a debate here saves you from shipping a confident paragraph,
+the repository will happily take a star. Contributions and counterexamples are welcome:
+the most useful
 [issue](https://github.com/fashionmascherine-svg/formalswarm/issues) you can open is a
 `seal_plan` that made the rollup return the wrong verdict.
