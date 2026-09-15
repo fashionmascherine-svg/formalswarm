@@ -19,7 +19,10 @@ const pkg = require(path.join(ROOT, 'package.json'))
 const brief = require('./brief.js')
 const driver = require('./driver.js')
 
-/* Every file FormalSwarm actually ships. `agents/` (legacy) and `tests/` are out. */
+/* Every file FormalSwarm actually ships: the walk below covers the shipped directories
+   plus the top-level files. `tests/` IS shipped (package.json `files` includes
+   tests/*.js and tests/fixtures/**), so it is scanned like the rest. `agents/`
+   (legacy) is not part of the package and stays out. */
 function shippedFiles() {
   const list = [
     'package.json', 'cordis.patch.yml', 'README.md', 'CHANGELOG.md', 'LICENSE',
@@ -35,7 +38,7 @@ function shippedFiles() {
       else list.push(child.replace(/\\/g, '/'))
     })
   }
-  ;['core', 'prompts', 'skills', 'commands'].forEach(walk)
+  ;['core', 'prompts', 'skills', 'commands', 'tests'].forEach(walk)
   // This validator necessarily contains the forbidden patterns it looks for.
   // And a file that is not here cannot be scanned: `.gitignore` and `.gitattributes`
   // live in the repository but npm does not package them, so a scan of an installed

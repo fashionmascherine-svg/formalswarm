@@ -333,6 +333,32 @@ prova('rollup: parallel is faithful — a thunk that throws becomes null and the
   assert.ok(out.global_verdict.warnings.join(' ').indexOf('phase THESIS: 1') >= 0)
 })
 
+prova('rollup: one fallen critic is a warning, not a dead phase — the phase dies only when the whole group is silent', async () => {
+  const cycle = agents({ critic: (l) => (l === 'critic-1' ? null : []) })
+  const out = await run({ n_thesis: 2, n_critics: 2, n_seals: 1, seal_plan: ['check A'], rounds: 1 }, cycle.map)
+  assert.strictEqual(out.fallen_agents.some((c) => c.agent === 'critic-1'), true)
+  assert.strictEqual(out.global_verdict.outcome, 'CONFIRM')
+  assert.ok(out.global_verdict.warnings.join(' ').indexOf('phase ANTITHESIS: 1') >= 0)
+})
+
+prova('rollup: an outcome outside the enum is unsupported, not a pass — the boundary must not be load-bearing', async () => {
+  const cycle = agents({ seal: (l, p) => sealedFrom(p, { patch: { outcome: 'OK' } }) })
+  const out = await run({ n_seals: 1, seal_plan: ['check A'], rounds: 1 }, cycle.map)
+  assert.strictEqual(out.verdict_review[0].effective, 'INCONCLUSIVE')
+  assert.strictEqual(out.verdict_review[0].coherence, 'corrected_by_the_body')
+  assert.strictEqual(out.global_verdict.outcome, 'INCONCLUSIVE')
+  assert.ok(out.verdict_review[0].notes.join(' ').indexOf('outside the protocol enum') >= 0)
+})
+
+prova('rollup: a non-integer case count falls back to the -1 sentinel and cannot confirm', async () => {
+  const cycle = agents({ seal: (l, p) => sealedFrom(p, { patch: { cases: NaN } }) })
+  const out = await run({ n_seals: 1, seal_plan: ['check A'], rounds: 1 }, cycle.map)
+  assert.strictEqual(out.verdict_review[0].effective, 'INCONCLUSIVE')
+  assert.strictEqual(out.verdict_review[0].coherence, 'corrected_by_the_body')
+  assert.strictEqual(out.global_verdict.outcome, 'INCONCLUSIVE')
+  assert.ok(out.verdict_review[0].notes.join(' ').indexOf('cases not counted') >= 0)
+})
+
 /* ── partition, objections, synthesis ────────────────────────────────────── */
 
 prova('partition: each critic sees only its own theses in the prompt', async () => {

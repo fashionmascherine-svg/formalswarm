@@ -159,3 +159,46 @@ offline gate grew from 93 to 107 checks):
 - **The end-to-end smoke test hard-coded `python3`**, which a default Windows Python
   installation does not provide; it now emits `python` there. Both suites are green
   under Node on Linux and on Windows.
+
+### Fixed by the first FormalSwarm debate on FormalSwarm
+
+The first published debate ran on this repository itself (5+5+5, 15 agent calls, 6 real
+seal commands) and the rollup returned **REVISE**: every assigned check was green with
+counted cases, but all five verifiers independently reproduced one blocking doc-vs-code
+mismatch with commands of their own. All findings below are fixed and pinned by the
+gate, which grew from 110 to 114 checks:
+
+- **The docs overstates the fallen-agent rule.** README and protocol said any refused
+  spawn "kills the phase and yields `INCONCLUSIVE`"; the code enforces that only when
+  no agent of a group answers, and per-agent for the seal — a partial fall elsewhere is
+  recorded and warned. The sentences now state the real rule, and a new counted check
+  pins it (one fallen critic → `CONFIRM` with a warning; the whole-group and seal rules
+  were already pinned).
+- **The rollup could be talked past its enum.** On a runtime whose boundary skips
+  schema validation (the DeepSeek Harness `workflow` tool cannot be verified from this
+  repository), an `outcome` of `"OK"` or a `cases` of `NaN` passed every comparison
+  (`typeof NaN === 'number'`) and could reach `CONFIRM`. The outcome enum is now closed
+  — anything outside `{ok, failed, not_run}` is `unsupported` — and non-integer
+  `exit_code`/`cases` fall back to the `-1` sentinel, so the pessimistic branches fire.
+  Two new counted checks pin both.
+- **The offline gate was load-dependent on Windows.** `validate-driver` and
+  `validate-profile` shared one fixed temp root with per-process deterministic names
+  and bare `rmSync`: under handle lag a stale file could answer a pending call and
+  `rm->mkdir` could hit `ENOTEMPTY` (observed once in seven runs, failing a correct
+  repository). Temp roots are now per-process unique (`mkdtempSync`) and every removal
+  retries.
+- **The protocol's worst-case table misstated a row**: 20+10+10 with `rounds=3` is 90
+  by the formula the code enforces, not 120; the rollup table now also records the
+  out-of-enum and non-integer rules, and the "empty command" row carries its real
+  exception (a declared `failed` stays `failed`).
+- **The objection-type list in the README omits `other`**, which the schema enum has
+  had all along.
+- **The stop criteria are now labelled for what they are** — the operator's decision
+  rules for choosing `--rounds`, not an enforced mechanism.
+- **The genericity scan now covers `tests/`**, which `package.json` ships
+  (`tests/*.js`, `tests/fixtures/**`): the guard scans exactly what a distribution
+  contains.
+- **The `nested` fixture is wired into the profiler suite** (content probe finds the
+  stack below the root; commands stay honestly `null`) instead of being dead inventory.
+- **`listDir` removed** from `core/profile.js`: exported, documented nowhere, called
+  by nothing — a dead control.

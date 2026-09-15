@@ -39,7 +39,7 @@ Raising it is a flag, not a redesign:
 | 5+5+5 | 1 | 15 | default ceiling |
 | 5+5+5 | 2 | 20 | `--max-calls 20` |
 | 60+40+40 (wide) | 1 | 140 | `--max-calls 140` |
-| 20+10+10 (full cycle) | 3 | 120 | `--max-calls 120` |
+| 20+10+10 (full cycle) | 3 | 90 | `--max-calls 90` |
 
 Real cost is usually below the worst case: synthesis phases start only for writers with
 at least one objection, and a critic with an empty partition is never spawned.
@@ -55,8 +55,12 @@ Two guards keep a large run honest rather than merely large:
   and in `outcome.json`.
 
 The runtime caps how many subagents actually run at once. A spawn the runtime refuses is
-a **fallen agent**, which kills the phase and yields `INCONCLUSIVE` — never a silent
-pass. That is why a very wide run should be read together with `fallen_agents`.
+a **fallen agent**: it is recorded in `fallen_agents` and warned about — never a silent
+pass. The phase dies and the verdict becomes `INCONCLUSIVE` when **no agent of the group
+answers** (a dead phase), and any fallen **seal** verifier makes the verdict
+`INCONCLUSIVE` on its own; elsewhere a partial fall is recorded and warned while the
+debate continues. That is why a very wide run should be read together with
+`fallen_agents`.
 
 ## Objection ledger
 
@@ -91,11 +95,13 @@ Per check, from the verifier's own numbers:
 
 | Declared | `exit_code` | `cases` | Normalized |
 |---|---|---|---|
+| outside `{ok, failed, not_run}` | any | any | `unsupported` — an undeclared outcome proves nothing |
+| `ok` | non-integer or `-1` | any | `not_run` — a non-integer falls back to the `-1` sentinel |
 | `ok` | `-1` | any | `not_run` |
 | `ok` | `!= 0` | any | `failed` |
-| `ok` | `0` | `<= 0` | `unsupported` (empty green) |
+| `ok` | `0` | non-integer or `<= 0` | `unsupported` — empty green or uncounted |
 | `ok` | `0` | `> 0` | `ok` |
-| any | any | any | an empty or blank `command` is `unsupported`: a check that names no command cannot be reproduced |
+| any | any | any | an empty or blank `command` is `unsupported`: a check that names no command cannot be reproduced — except a declared `failed`, which stays `failed` (a failure is never softened) |
 | `failed` / `not_run` | any | any | kept as declared (pessimistic) |
 
 **Coverage is a match, not a count.** Every assigned check must be answered by a
@@ -146,6 +152,10 @@ theses, current_theses, objections, synthesis, seal_verdicts, verdict_review, fa
 ```
 
 ## Stop criteria
+
+These are the **operator's** decision rules for choosing `--rounds` and reading the
+outcome — the body always runs exactly the rounds the brief declares and enforces no
+saturation test of its own:
 
 - Two consecutive rounds with no new objection of severity `major` or `blocking` →
   the debate is saturated; go to the seal.

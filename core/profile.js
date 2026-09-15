@@ -87,7 +87,6 @@ const isFile = (p) => { try { return fs.statSync(p).isFile() } catch (e) { retur
 const isDir = (p) => { try { return fs.statSync(p).isDirectory() } catch (e) { return false } }
 const readText = (p) => { try { return fs.readFileSync(p, 'utf8') } catch (e) { return '' } }
 const readJson = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')) } catch (e) { return null } }
-const listDir = (p) => { try { return fs.readdirSync(p) } catch (e) { return [] } }
 const firstExisting = (root, names) => names.filter((n) => isFile(path.join(root, n)))[0] || null
 const isText = (v) => typeof v === 'string' && v.trim().length > 0
 
@@ -493,5 +492,4 @@ module.exports = {
   scratchAbs: scratchAbs,
   validateProfile: validateProfile,
   initProfile: initProfile,
-  listDir: listDir,
 }

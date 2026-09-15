@@ -19,10 +19,13 @@ const FIXTURES = path.join(__dirname, '..', 'tests', 'fixtures')
 const fixture = (name) => path.join(FIXTURES, name)
 
 let counter = 0
-const tmpRoot = path.join(os.tmpdir(), 'formalswarm-profile-tests')
+// Per-process unique root: the suite must not share directories with any other run,
+// or a leftover file can answer an assertion and rm->mkdir can hit ENOTEMPTY on Windows.
+const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'formalswarm-profile-tests-'))
+const rmTree = (dir) => fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 })
 const freshDir = (name) => {
   const dir = path.join(tmpRoot, name + '-' + (++counter))
-  fs.rmSync(dir, { recursive: true, force: true })
+  rmTree(dir)
   fs.mkdirSync(dir, { recursive: true })
   return dir
 }
@@ -252,12 +255,19 @@ prova('frozen paths only ever name directories that exist', () => {
   assert.ok(p.source_dirs.indexOf('app') < 0, 'a directory that does not exist must not be listed')
 })
 
+prova('nested: the content probe finds the stack below the root and never invents a command', () => {
+  const p = profiles.detectProfile(fixture('nested'))
+  assert.strictEqual(p.stack, 'python')
+  assert.strictEqual(p.test_command, null, 'no manifest names a runner: the profile must say so, not guess')
+  assert.ok(p.notes.join(' ').indexOf('no test command detected') >= 0, p.notes.join(' '))
+})
+
 async function runAll() {
   let failed = 0
   for (const t of tests) {
     try { await t.fn() } catch (e) { failed++; console.error('FAILED  ' + t.name + ' :: ' + (e && e.message)) }
   }
-  fs.rmSync(tmpRoot, { recursive: true, force: true })
+  rmTree(tmpRoot)
   return { suite: 'profile', total: tests.length, failed: failed }
 }
 

@@ -580,13 +580,23 @@ sealRuns.forEach((r, i) => {
 /* ── DETERMINISTIC ROLLUP ────────────────────────────────────────────────── */
 
 const normalizeChecks = (checks) => (checks || []).map((c) => {
-  const exit = typeof c.exit_code === 'number' ? c.exit_code : -1
-  const cases = typeof c.cases === 'number' ? c.cases : -1
+  // Only an integer is an exit code or a count: NaN is a number and "0" is a string,
+  // and either would slip past every comparison below — both fall back to the -1
+  // sentinel so the pessimistic branches fire. A runtime whose boundary skips schema
+  // validation must not be able to smuggle a non-number past the rollup.
+  const exit = Number.isInteger(c.exit_code) ? c.exit_code : -1
+  const cases = Number.isInteger(c.cases) ? c.cases : -1
   let outcomeNorm = c.outcome
   const notes = []
-  if (c.outcome === 'ok' && exit === -1) { outcomeNorm = 'not_run'; notes.push('outcome "ok" but exit_code=-1 (the not-run sentinel): the check does not appear to have been run') }
-  else if (c.outcome === 'ok' && exit !== 0) { outcomeNorm = 'failed'; notes.push('outcome "ok" but exit_code=' + exit) }
-  else if (c.outcome === 'ok' && cases <= 0) { outcomeNorm = 'unsupported'; notes.push(cases === 0 ? 'empty green: 0 cases seen' : 'cases not counted (the -1 sentinel): the green is unverifiable') }
+  // The outcome enum is closed: any other string (or a non-string) is not a
+  // measurement and cannot be read as one — not even a near miss like "OK".
+  if (outcomeNorm !== 'ok' && outcomeNorm !== 'failed' && outcomeNorm !== 'not_run') {
+    outcomeNorm = 'unsupported'
+    notes.push('outcome ' + JSON.stringify(c.outcome) + ' is outside the protocol enum {ok, failed, not_run}: an undeclared outcome proves nothing')
+  }
+  else if (outcomeNorm === 'ok' && exit === -1) { outcomeNorm = 'not_run'; notes.push('outcome "ok" but exit_code=-1 (the not-run sentinel): the check does not appear to have been run') }
+  else if (outcomeNorm === 'ok' && exit !== 0) { outcomeNorm = 'failed'; notes.push('outcome "ok" but exit_code=' + exit) }
+  else if (outcomeNorm === 'ok' && cases <= 0) { outcomeNorm = 'unsupported'; notes.push(cases === 0 ? 'empty green: 0 cases seen' : 'cases not counted (the -1 sentinel): the green is unverifiable') }
   // A check that names no command is not a measurement, whatever its exit code says.
   // A declared failure is never softened by this: it stays failed.
   if (outcomeNorm !== 'failed' && !isText(c.command)) {

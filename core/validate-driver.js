@@ -58,10 +58,15 @@ const thesisMock = (n) => ({ id: 'x', thesis: 'T' + n, findings: [], risks: [], 
 const objection = (id, severity, evidence) => ({ thesis_id: id, type: 'logic_bug', severity: severity, evidence: evidence || 'a.py:1: something', fix: 'change the line' })
 
 let dirCounter = 0
-const scratchRoot = path.join(os.tmpdir(), 'formalswarm-driver-tests')
+// Per-process unique root: two gate runs (or two nodes) must never share directories.
+// A fixed shared root made the suite load-dependent on Windows — a leftover file from
+// a crashed run could answer a pending call, and rm->mkdir could hit ENOTEMPTY under
+// handle lag, failing a correct repository (observed once in seven runs).
+const scratchRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'formalswarm-driver-tests-'))
+const rmTree = (dir) => fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 })
 const freshDir = (name) => {
   const dir = path.join(scratchRoot, name + '-' + (++dirCounter))
-  fs.rmSync(dir, { recursive: true, force: true })
+  rmTree(dir)
   fs.mkdirSync(dir, { recursive: true })
   return dir
 }
@@ -466,7 +471,7 @@ async function runAll() {
   for (const t of tests) {
     try { await t.fn() } catch (e) { failed++; console.error('FAILED  ' + t.name + ' :: ' + (e && e.message)) }
   }
-  fs.rmSync(scratchRoot, { recursive: true, force: true })
+  rmTree(scratchRoot)
   return { suite: 'driver', total: tests.length, failed: failed }
 }
 
