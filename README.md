@@ -61,6 +61,61 @@ Anyone can recompute that verdict. Nobody has to trust a paragraph.
 
 ---
 
+## Verify it yourself in 30 seconds
+
+Zero agent calls, no API key, no network:
+
+```sh
+node core/validate-all.js   # -> ALL SUITES GREEN — 114 checks (body 48, driver 24, profile 23, generic 19)
+node tests/smoke-e2e.js     # builds real throwaway projects, spawns the seal commands, asserts real exit codes
+```
+
+Both must exit `0`. The first is the whole offline gate: every rollup branch, driver
+identity, profiler fixture and genericity guard, counted one by one — 114 lines of
+proof, about four seconds. The second needs `python` (or `python3`) on `PATH` for its
+fixture toolchain.
+
+## A verdict this repository computed about itself
+
+FormalSwarm's first published debate ran on FormalSwarm itself: 5 theses, 5 critics,
+5 seal verifiers, 6 real commands, 15 agent calls. The rollup returned **REVISE** —
+read straight from `outcome.json`:
+
+```jsonc
+{
+  "global_verdict": {
+    "outcome": "REVISE",
+    "reason": "at least one seal check fails (exit_code != 0) or a verifier declares REVISE",
+    "warnings": ["phase ANTITHESIS: 1 fallen agent(s)"]
+  },
+  "objection_count": { "total": 11, "accepted": 0, "rejected": 0, "unanswered": 0, "to_answer": 11, "orphan": 0 }
+}
+```
+
+What the 15 agents actually measured:
+
+- Every **assigned** seal check was green with counted cases: the offline gate
+  (`node core/validate-all.js`, `exit_code: 0`, `cases: 110`), the end-to-end smoke
+  (`node tests/smoke-e2e.js`, `exit_code: 0`, `cases: 6`, a green fixture reaching
+  `CONFIRM` and a broken one `REVISE` quoting the real exit code), and the driver and
+  genericity suites. The installed plugin copy passed the same gate in place.
+- All five verifiers **independently reproduced the one blocking objection** with their
+  own discriminating commands (`exit_code: 1`): the docs claimed any refused spawn
+  makes the verdict `INCONCLUSIVE`, while the code enforces that only for a whole
+  silent group and for the seal — a partial fall elsewhere was a warning, and the
+  suite even pinned the contradicting behavior green.
+- One critic fell for a reason the protocol is proud of: its answer missed required
+  schema fields, `save` refused it, and the run recorded a fallen agent instead of
+  reading a malformed answer.
+
+The fix (narrow the two doc sentences, harden the rollup against out-of-enum outcomes
+and non-integer counts, make the gate's temp directories per-process unique, and pin
+the real partial-fall semantics with new counted checks) took the gate from 110 to 114
+green checks. The verdict was never edited: `REVISE` is what the code computed, and the
+corrections came after it.
+
+---
+
 ## The problem this exists for
 
 A capable agent reviews a change and writes a confident, well-argued paragraph. It is
@@ -121,7 +176,7 @@ question.
 | Phase | Who | Must produce |
 |---|---|---|
 | `THESIS` | `n_thesis` writers, isolated subagents | a position, its findings with `path:line` evidence, its risks, and the measurement that would prove it |
-| `ANTITHESIS` | `n_critics`, each handed a **disjoint partition** of the theses | objections with re-read evidence: `hallucination`, `dead_control`, `dead_guard`, `logic_bug`, `bad_measurement`, `empty_green`, `safety` |
+| `ANTITHESIS` | `n_critics`, each handed a **disjoint partition** of the theses | objections with re-read evidence: `hallucination`, `dead_control`, `dead_guard`, `logic_bug`, `bad_measurement`, `empty_green`, `safety`, `other` |
 | `SYNTHESIS` | only the writers actually attacked (`rounds ≥ 2`) | answers that copy the objection's evidence string verbatim, so the accept/reject count is deterministic |
 | `ANTITHESIS-2` | `n_critics` on the revised state with a deterministic board (`rounds = 3`) | genuinely new objections; already-accepted ones are absorbed |
 | `SEAL` | `n_seals` verifiers, each with a disjoint slice of your `seal_plan` | `command`, `outcome`, `exit_code`, `cases`, `detail` — and a per-check measurement limit |
@@ -168,8 +223,10 @@ Two things keep a large run honest rather than merely large:
 
 The runtime is the final arbiter of concurrency: DeepSeek Harness, Claude Code and ZCode
 each cap how many subagents run at once. A spawn the runtime refuses is recorded as a
-**fallen agent**, which makes the phase dead and the verdict `INCONCLUSIVE` — never a
-silent pass.
+**fallen agent** and warned about — never a silent pass. The phase dies and the verdict
+becomes `INCONCLUSIVE` when *no agent of the group answers*, and any fallen *seal*
+verifier is `INCONCLUSIVE` on its own; elsewhere a partial fall is recorded and warned
+while the debate continues.
 
 ---
 
