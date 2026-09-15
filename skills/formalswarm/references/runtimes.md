@@ -36,6 +36,11 @@ the object printed by `meta`, and `args` = the JSON printed by `brief`. The tool
 spawns every subagent itself, in parallel per phase. Nothing else is needed — the
 harness is the only runtime with a native orchestration primitive.
 
+On this runtime the outcome object comes back as the workflow tool's return
+value: nothing writes it to disk for you. Save it to `<scratch>/outcome.json`
+yourself (e.g. from the orchestrator session) so the verdict stays auditable and
+step 5 below reads the same file on all three runtimes.
+
 `args` can also be given to the round loop below instead, which is useful for a
 headless run or to inspect the prompts before spending calls.
 
