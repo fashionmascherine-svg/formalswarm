@@ -6,13 +6,20 @@
 
 ![FormalSwarm cover — thesis, antithesis, seal: a verdict you can recompute](docs/cover.jpg)
 
-**Your agent says the change is safe. FormalSwarm makes it prove it.**
+**Don't settle for an AI answer. Make it survive a debate — and a check.**
 
-Independent agents write *theses* in parallel, adversarial critics tear them down, and a
-*seal* runs real commands — then a deterministic rollup reads the verdict out of exit
-codes and case counts, never out of an agent's prose. Any repository, any language, any
-scale: from a 6-agent pilot to hundreds of agents. On DeepSeek Harness, Claude Code and
-ZCode from one and the same code.
+FormalSwarm helps agents propose solutions, challenge assumptions, and verify the claims
+that can actually be tested. Start with **a codebase or a folder of documents**: a change
+to review, a funnel to design, or a plan to stress-test.
+
+Independent agents write *theses*, adversarial critics challenge them, and a *seal* runs
+real commands. A deterministic rollup computes `CONFIRM`, `REVISE`, or `INCONCLUSIVE`
+from reported checks, exit codes and case counts — not a confidence score. The verdict
+covers the checks you defined, not every recommendation the agents make.
+
+Built for repositories, also usable for **guided, document-driven problem solving**.
+From a 6-agent pilot to hundreds of agents, on DeepSeek Harness, Claude Code and ZCode
+from one and the same code.
 
 [![ci](https://github.com/fashionmascherine-svg/formalswarm/actions/workflows/ci.yml/badge.svg)](https://github.com/fashionmascherine-svg/formalswarm/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -20,6 +27,151 @@ ZCode from one and the same code.
 ![runtimes](https://img.shields.io/badge/runtimes-DeepSeek%20Harness%20%7C%20Claude%20Code%20%7C%20ZCode-blueviolet.svg)
 ![agent calls to validate](https://img.shields.io/badge/agent%20calls%20to%20validate%20it-0-informational.svg)
 [![discussions](https://img.shields.io/badge/discussions-welcome-8A2BE2.svg)](https://github.com/fashionmascherine-svg/formalswarm/discussions)
+
+**[Start with code](#the-60-second-version) · [Start with documents](#beyond-code-turn-documents-into-a-testable-plan) · [Install](#install) · [Check the proof](#verify-it-yourself-in-30-seconds)**
+
+> More agents can give you more ideas. FormalSwarm gives those ideas an adversary —
+> and gives testable claims a check. If that is how you want agents to work,
+> **[star FormalSwarm](https://github.com/fashionmascherine-svg/formalswarm)**.
+
+---
+
+## Beyond code: turn documents into a testable plan
+
+**No Git repository required. Bring the problem, the documents, and the constraints.**
+
+You can use FormalSwarm to develop and challenge solutions outside software: a funnel,
+launch plan, operating process, or resource allocation. The proposals come from the
+agents; FormalSwarm structures their debate and checks the measurable claims. These
+are applications of the same protocol, not built-in specialist tools or a guarantee
+that every kind of problem can be decided automatically.
+
+### Example: design a funnel from a folder
+
+Open a workspace folder in your coding agent and give it 3–6 context files. Plain text,
+Markdown, JSON, and readable data exports work well; extract PDFs or other binary
+formats into readable files first. You do **not** need application code or Git.
+
+```text
+funnel-project/
+  objective.md       # Desired outcome, audience, and what success means
+  offer.md           # Product/service facts, prices, verified promises, source links
+  constraints.md     # Spending cap, timing, capacity, and approval boundaries
+  current-journey.md # Existing ads, pages, calls to action, and known friction
+  evidence.csv       # Optional: actual observations with units and date ranges
+```
+
+Missing evidence is useful information too. If you have no results yet, say so in the
+brief instead of filling the gap with invented numbers. Label illustrative figures as
+assumptions, not observations. Keep customer data and secrets out of shared materials.
+
+After installing the plugin, explicitly ask your agent to use FormalSwarm. For example:
+
+```text
+Use FormalSwarm on this folder to propose a better acquisition funnel.
+
+Read objective.md, offer.md, constraints.md, and current-journey.md.
+Produce two independent proposals, challenge their assumptions, and identify
+which parts can actually be verified from the available evidence.
+
+For each proposal, explain the audience, message, destination page, primary
+action, follow-up, spending allocation, and measurement plan. Distinguish
+source facts, assumptions, recommendations, and measured results.
+
+Before starting the debate, define the verdict question and runnable checks.
+Use 2 thesis writers, 2 critics, and 2 seal verifiers, with one round and a
+maximum of 6 agent calls. Keep all source documents unchanged; put drafts and
+verification scripts in scratch. Do not publish, spend, or contact anyone.
+
+Return a recommended plan with trade-offs, the objections and open questions,
+and the computed verdict with its exact scope. Do not interpret a sound budget
+or a complete plan as proof that the funnel will improve real-world results.
+```
+
+This is an instruction to the **host agent**, not a new CLI command or an unattended
+campaign builder. The host must turn it into a brief, prepare meaningful checks, run
+the offline gate, and orchestrate the rounds. The current role prompts remain
+engineering-oriented, so explicitly describing the non-code task matters.
+
+### What each group does with documents
+
+1. **Thesis writers propose solutions.** They read the same source documents in isolated
+   contexts and defend concrete alternatives. For a funnel, one might recommend a
+   direct-conversion journey, another an assisted journey. These are hypotheses to
+   evaluate, not automatically proven winners.
+2. **Critics challenge the reasoning.** They check the proposals against the documents:
+   unsupported promises, incompatible constraints, omitted costs, unnecessary steps,
+   or a measurement plan that counts activity instead of the desired outcome.
+3. **Optional synthesis answers objections.** With `--rounds 2`, challenged writers
+   respond to the critique; the host must allow the larger call budget. One round
+   leaves proposals and objections for the final review without this response phase.
+4. **Seal verifiers execute the checks.** They can recompute allocations, validate
+   structured data, or run an appropriate analysis over supplied observations. Taste,
+   persuasion, and future demand do not become facts because an agent scores them.
+5. **The host presents the solution and the evidence separately.** The recommended plan
+   is an argued synthesis. `outcome.json` is the computed verdict on the assigned
+   checks. An untested recommendation must not inherit their confirmation.
+
+### Define a question the evidence can answer
+
+Instead of one broad question — *"Will this funnel work?"* — separate the decisions:
+
+| Question | Evidence or check | What remains unproven |
+|---|---|---|
+| Does the allocation fit the spending cap? | Recompute duration × daily allocations, including declared costs | Actual delivery and effectiveness |
+| Are the supplied results internally consistent? | Validate nonempty records, units, totals, and duplicates | Causality and future performance |
+| Does the proposed journey improve the desired outcome? | An appropriate real experiment and a reviewed analysis with predefined criteria | Anything outside that experiment's scope |
+
+A script that merely finds the word "conversion" in a plan does not validate the
+plan's effectiveness. Neither does a second model giving it 9/10. The rollup checks
+reported outcomes and coverage; it cannot make a poorly chosen test meaningful.
+
+### How the folder enters the existing workflow
+
+The same `init`, `brief`, and `run` flow applies. Point `--repo` at the document folder;
+the flag name does **not** mean Git is mandatory. With no stack or runner detected,
+the profile reports `stack: unknown` and no test command. Supply explicit seal checks.
+
+For hosts building the brief through the CLI, the shape is:
+
+```sh
+# Use the FS command resolved for your installed plugin (see the quickstart below).
+$FS init --repo ./funnel-project
+$FS brief --repo ./funnel-project \
+  --objective "Develop a funnel within the documented constraints" \
+  --verdict-question "Does the proposed allocation fit the documented spending cap?" \
+  --context objective.md,offer.md,constraints.md,current-journey.md \
+  --seal "node .formalswarm/scratch/check-budget.cjs" \
+  --thesis 2 --critics 2 --seals 1 --rounds 1 --max-calls 5
+```
+
+This is a **template**, not a bundled funnel demo: the documents and
+`check-budget.cjs` must exist first. Have the host create and review that check against
+an explicit candidate allocation in scratch, then run it from the document folder or
+use absolute paths. It must be able to fail, return a real exit status, and count the
+actual cases evaluated. The single verifier here matches the single assigned check;
+use more verifiers only when there are enough checks to assign.
+
+Run `$FS validate` before launching. Then use `$FS run <generated-brief.json>` and the
+[host-agent round loop](skills/formalswarm/references/runtimes.md): execute final pending
+prompts, save their answers, and repeat until the driver writes `outcome.json`.
+A standalone `run` command does not itself supply the host's subagent tools.
+
+### Tried with documents, not just described
+
+A guided local funnel pilot completed with the **unmodified plugin**, a non-Git folder,
+three context documents, and three real agents: one writer, one critic, one verifier.
+The host prepared the documents and checks; no campaign was launched. With deliberately
+synthetic inputs, the original allocation was **700 against a cap of 600**. The budget
+check failed with `exit_code: 1` and `cases: 1`; the driver returned **`REVISE`**.
+A proposed allocation of 560 passed a separate arithmetic check, not a second global
+approval. Real-world effectiveness remained unmeasured: the explicit missing-evidence
+placeholder reported `not_run` with zero cases; it was not an effectiveness analyzer.
+
+This establishes a guided non-code workflow, not a benchmark of solution quality or
+commercial success. The pilot artifacts are local, not bundled as a reproducible
+example in this repository. **The useful outcome is a better-specified plan, visible
+assumptions, and clear next measurements — not certainty invented by a swarm.**
 
 ---
 
@@ -361,9 +513,15 @@ prompt file the driver wrote. Slash commands `/formalswarm-init`, `/formalswarm-
 
 ## What it does not do
 
-- **It does not decide unmeasurable questions.** If the repository cannot answer the
-  verdict question, the honest output is `INCONCLUSIVE` with the missing data named and
-  the threshold that would settle it. That is the feature, not a gap.
+- **It does not decide unmeasurable questions.** If the codebase or document folder
+  cannot answer a claim, that claim remains unproven: report the missing evidence and
+  what would settle it. With a complete seal and no failure or declared `REVISE`,
+  missing or empty evidence makes the verdict `INCONCLUSIVE`. A failing check or a
+  verifier's declared `REVISE` takes precedence over that missing evidence.
+- **It does not certify an entire strategy from a narrow check.** A valid budget is
+  not a validated funnel. Recommendations can be useful while their expected impact
+  remains a hypothesis. No built-in campaign access, automatic spending, or specialist
+  effectiveness analyzer is implied.
 - **It does not make agents correct.** A hallucinated `path:line` is exactly what the
   critic group exists to catch, and every critic objection must carry re-read evidence.
 - **It does not replace your CI.** The seal runs the commands you name; if a check is
